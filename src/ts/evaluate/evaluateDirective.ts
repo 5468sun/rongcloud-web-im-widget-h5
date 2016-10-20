@@ -5,6 +5,7 @@ var evaluate = angular.module("Evaluate", []);
 evaluate.directive("evaluatedir", ["$timeout", function($timeout: angular.ITimeoutService) {
     return {
         restrict: "E",
+        replace:true,
         scope: {
             type: "=",
             display: "=",

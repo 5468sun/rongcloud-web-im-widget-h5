@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         src:["./dist/*"]
       },
       temp:{
-        src:['./temp']
+        src:['./temp/**/*','./temp/*']
       }
     },
 
@@ -114,6 +114,10 @@ module.exports = function(grunt) {
             dest:'./build/main.js'
           },
           {
+            src:['./bower_components/lib-flexible/build/flexible.js'],
+            dest:'./build/flexible.js'
+          },
+          {
             src:[
               './vendor/jqueryrebox/jquery-rebox.css',
               './bower_components/bootstrap/dist/css/bootstrap.min.css',
@@ -135,6 +139,10 @@ module.exports = function(grunt) {
               './temp/main.js','./temp/myAppHTMLCache.js',
             './vendor/loadscript/script.min.js','./vendor/qiniu/qiniu.js'],
             dest:'./dist/main.js'
+          },
+          {
+            src:['./bower_components/lib-flexible/build/flexible.js'],
+            dest:'./dist/flexible.js'
           },
           {
             src:[

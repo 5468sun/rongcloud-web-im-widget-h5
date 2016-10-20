@@ -25,17 +25,17 @@ widget.run(["$http", "WebIMWidget", "widgetConfig", "RongKefu", function($http: 
     });
     $script.get(protocol + "//cdn.bootcss.com/plupload/2.1.8/plupload.full.min.js", function() { });
 }]);
-$(function() {
-    //rem
-    var winW = document.documentElement.clientWidth;
-    var desW = 1242;
-    var fontSize = 100;
-    var rem = desW / fontSize;
-    if (winW > desW) {
-        winW = desW;
-    }
-    document.documentElement.style.fontSize = winW / rem + 'px';
-})
+// $(function() {
+//     //rem
+//     var winW = document.documentElement.clientWidth;
+//     var desW = 1242;
+//     var fontSize = 100;
+//     var rem = desW / fontSize;
+//     if (winW > desW) {
+//         winW = desW;
+//     }
+//     document.documentElement.style.fontSize = winW / rem + 'px';
+// })
 
 widget.factory("providerdata", [function() {
     var obj = {
@@ -229,7 +229,6 @@ widget.factory("WebIMWidget", ["$q", "conversationServer",
                 }
             });
 
-
         }
 
         function addMessageAndOperation(msg: WidgetModule.Message) {
@@ -275,6 +274,7 @@ widget.factory("WebIMWidget", ["$q", "conversationServer",
 widget.directive("rongWidget", [function() {
     return {
         restrict: "E",
+        replace:true,
         templateUrl: "./src/ts/main.tpl.html",
         controller: "rongWidgetController"
     }

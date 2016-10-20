@@ -28,59 +28,61 @@ body{
 	------------Reset   End--------------
 */
 
+html,body{
+    width: 100%;
+    height: 100%;
+}
 .rongcloud-sprite{
     background: url(../images/icon.png) no-repeat;
     background-size: 2.4rem auto;
 }
 .rongcloud-sprite2{background: url(../images/icon2.png) no-repeat;background-size: 3.6rem auto;}
+
+.rongWidget{
+    width: 100%;
+    height: 100%;
+}
 /* header */
 .rongcloud-header{
     width: 100%;
-    height: 1.8rem;
-    line-height:1.8rem;
-    font-size:16px;
+    height: 90px;
+    font-size:28px;
     background: #0099ff;
     position: fixed;
     top: 0;
     z-index: 999;
     text-align:center;
-    display: -webkit-box;
-    -webkit-box-sizing: border-box;
-    -webkit-box-pack: justify;
-    /*overflow: hidden;*/
-    zoom: 1;
-    padding: 0 0.4rem;
-    cursor: pointer;
-    /*border-bottom: 1px solid #c9deec;*/
-}
-.rongcloud-header:after{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    content: '';
-    width: 100%;
-    height: 1px;
-    border-top: 1px solid #c9deec;
-    -webkit-transform: scaleY(0.5);
-}
-.rongcloud-header .rongcloud-btn-right,.rongcloud-header > span{
-    display: -webkit-box;
-    text-decoration: none;
-    text-shadow: 0,-1 ,0,rgba(0,0,0,5);
-    color: #00aff0;
-}
-.rongcloud-header .rongcloud-btn-left,.rongcloud-header .rongcloud-btn-right{
-    border: 0;
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+
 }
 
-.rongcloud-header .rongcloud-btn-left{
-    background: none;
+.rongcloud-header .rongcloud-btn-left,.rongcloud-header .rongcloud-btn-right{
+    width: 90px;
+    height: 100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.rongcloud-header .rongcloud-btn-left img{
+    width: 30px;
+}
+
+.rongcloud-header .rongcloud-title{
+    flex: 1;
 }
 .rongcloud-header .rongcloud-title a{
     color: #fff;
     letter-spacing: .5px;
 }
 
+.rongcloud-main,.rongcloud-main_inner{
+    width: 100%;
+    height: 100%;
+}
 
 /* chatBox */
 .rongcloud-chatBox{

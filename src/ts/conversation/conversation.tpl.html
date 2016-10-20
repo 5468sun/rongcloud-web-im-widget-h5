@@ -1,14 +1,14 @@
 <div id="rong-conversation"  class="rongcloud-main rongcloud-kefuList" ng-show="showSelf">
     <evaluatedir type="evaluate.type" display="evaluate.showevaluate" confirm="evaluate.onConfirm(data)" cancle="evaluate.onCancle()"></evaluatedir>
-    <div class="rongcloud-main_inner rongcloud-clearfix">
+    <div class="rongcloud-main_inner">
         <header class="rongcloud-header">
-            <a class="rongcloud-icon_return" href="javascript:void 0" ng-click="close()">
-              <img src="../widget/images/arrow-left.png" width="16" alt=""/>
+            <a class="rongcloud-btn-left" href="javascript:void 0" ng-click="close()">
+              <img src="../widget/images/arrow-left.png" alt=""/>
             </a>
             <div class="rongcloud-title">
                 <a class="rongcloud-title_name rongcloud-online"><i class="rongcloud-Presence"></i>{{currentConversation.title}}</a>
             </div>
-            <a href="javascript:void 0"></a>
+            <a class="rongcloud-btn-right" href="javascript:void 0"></a>
         </header>
         <!-- <div id="wrapper" class="" ng-style="wrapperbottom"> -->
           <div id="wrapper" class="" ng-iscroll ng-style="wrapperbottom">

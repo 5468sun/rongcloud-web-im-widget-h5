@@ -3,12 +3,13 @@ var demo = angular.module("demo", ["RongCloudkefu"]);
 demo.controller("main", ["$scope","RongKefu", function($scope,RongKefu) {
   $scope.title="asdf";
   RongKefu.init({
-        appkey:"3argexb6r934e",//selfe
-        token:"I8zRoTYOdtHug+ox4s7HapUnU/cREmEFuMhOJuGv5bP+dl6CkOlF+WuQPPbm30kCrX6ygPNSBvlJzwuiv72NPw==",//selfe kefu
-        kefuId:"KEFU145914839332836",//selfe
+        appkey:"mgb7ka1nbkczg",//selfe
+        token:"V/Z/nwY7REJigmcfm/bk+T1T3zMswu0gBtgpGX74/E8EBtHNSjmKVYOs6chEtHSqICQoSl4ISUQiZs/NawvcEg==",//selfe kefu
+        kefuId:"KEFU147669210349165",//selfe
         position:RongKefu.KefuPostion.left,
         onSuccess:function(e){
           console.log(e);
+          RongKefu.show();
         }
   })
     $scope.show = function() {

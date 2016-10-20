@@ -22,6 +22,7 @@
     "bootstrap": "~3.3.6",
     "iscroll": "~5.1.3",
     "ng-iscroll": "*",
-    "Swipe": "swipe#~2.0.0"
+    "Swipe": "swipe#~2.0.0",
+    "lib-flexible": "*"
   }
 }

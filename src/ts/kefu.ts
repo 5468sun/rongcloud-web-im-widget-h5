@@ -8,11 +8,12 @@ var kefu = angular.module("RongCloudkefu", ["RongWebIMWidget"]);
 kefu.service("RongKefu", ["WebIMWidget", function(WebIMWidget: WebIMWidget) {
     var kefuServer = <KefuServer>{};
     var defaultconfig = <any>{
-        __isCustomerService: true
+        __isCustomerService: true,
+        showEvaluate:false
     };
 
     kefuServer.init = function(config) {
-        angular.extend(defaultconfig, config)
+        angular.extend(defaultconfig, config);
         kefuServer._config = config;
 
         WebIMWidget.init({
@@ -26,7 +27,8 @@ kefu.service("RongKefu", ["WebIMWidget", function(WebIMWidget: WebIMWidget) {
             WebIMWidget.setConversation(WidgetModule.EnumConversationType.CUSTOMER_SERVICE, config.kefuId, "客服");
         }
         WebIMWidget.onCloseBefore = function(obj) {
-            obj.close({ showEvaluate: true });
+
+            obj.close({ showEvaluate: defaultconfig.showEvaluate });
         }
 
     }
@@ -58,6 +60,7 @@ interface KefuConfig {
     kefuId: string
     position: KefuPostion
     onSuccess(par?: any): void
+    showEvaluate?:boolean
 }
 enum KefuPostion {
     left = 1, right = 2

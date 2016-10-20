@@ -6,6 +6,7 @@ conversationDirective.directive("rongConversation", [function() {
 
     return {
         restrict: "E",
+        replace:true,
         templateUrl: "./src/ts/conversation/conversation.tpl.html",
         controller: "conversationController",
         link: function(scope: any, ele: angular.IRootElementService) {

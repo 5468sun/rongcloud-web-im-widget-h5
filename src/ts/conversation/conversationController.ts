@@ -490,7 +490,7 @@ conversationController.controller("conversationController", ["$scope",
             if (WebIMWidget.onCloseBefore && typeof WebIMWidget.onCloseBefore === "function") {
                 var isClose = WebIMWidget.onCloseBefore({
                     close: function(data) {
-                        if (conversationServer.current.targetType == WidgetModule.EnumConversationType.CUSTOMER_SERVICE) {
+                        if (data.showEvaluate && conversationServer.current.targetType == WidgetModule.EnumConversationType.CUSTOMER_SERVICE) {
                             if ($scope.evaluate.valid) {
                                 $scope.evaluate.showevaluate = true;
                             } else {
