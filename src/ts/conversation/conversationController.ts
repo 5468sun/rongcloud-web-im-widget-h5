@@ -89,15 +89,15 @@ conversationController.controller("conversationController", ["$scope",
         $scope.$watch("showemoji", function(newVal, oldVal) {
             if (newVal === oldVal)
                 return;
-            if (newVal) {
-                $scope.wrapperbottom = {
-                    bottom: "9rem"
-                }
-            } else {
-                $scope.wrapperbottom = {
-                    bottom: "1.5rem"
-                }
-            }
+            // if (newVal) {
+            //     $scope.wrapperbottom = {
+            //         bottom: "9rem"
+            //     }
+            // } else {
+            //     $scope.wrapperbottom = {
+            //         bottom: "1.5rem"
+            //     }
+            // }
             $scope.refreshiScroll();
         });
 

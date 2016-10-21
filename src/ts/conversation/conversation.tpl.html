@@ -11,7 +11,7 @@
             <a class="rongcloud-btn-right" href="javascript:void 0"></a>
         </header>
         <!-- <div id="wrapper" class="" ng-style="wrapperbottom"> -->
-          <div id="wrapper" class="" ng-iscroll ng-style="wrapperbottom">
+          <div id="wrapper" ng-iscroll>
           <div id="scroller">
             <div id="Messages" class=""> <!-- empty -->
                 <div class="rongcloud-MessagesInner rongcloud-message-scroll">
@@ -53,16 +53,23 @@
         </div>
 
         <!-- footer -->
-        <footer  class="rongcloud-footer rongcloud-clearfix">
-          <div id="funcPanel" style="display: flex;display: -webkit-flex;">
-            <a  id="uploadfile" href="#" class="rongcloud-pull-left rongcloud-message_type_btn" ng-show="_inputPanelState==0">
+        <footer  class="rongcloud-footer">
+          <div id="funcPanel" class="funcPanel">
+            <!-- <a  id="uploadfile" href="#" class="rongcloud-pull-left rongcloud-message_type_btn" ng-show="_inputPanelState==0">
                 <i class="rongcloud-sprite2 rongcloud-icon_message_type1">
                 </i>
+            </a> -->
+
+            <a href="#" class="switchRenGongBtn" ng-click="switchPerson()" ng-show="_inputPanelState==2"> <!-- 机器 -->
+                <img class="icon" src="../widget/images/rengong.png" alt="">
+            </a>
+            <a href="#" class="emojiBtn"  ng-show="_inputPanelState==0" ng-click="showemoji=!showemoji"><!-- 人工 表情 -->
+                <img class="icon" src="../widget/images/emoji.png" alt="">
+            </a>
+            <a href="#" class="keyboardBtn"  ng-show="_inputPanelState==0" ng-click="showemoji=!showemoji"><!-- 人工 键盘 -->
+                <img class="icon" src="../widget/images/rengong.png" alt="">
             </a>
 
-            <a href="#" class="rongcloud-pull-left rongcloud-message_type2_btn" ng-click="switchPerson()" ng-show="_inputPanelState==2">
-                <span class="">转人工服务</span>
-            </a>
             <div class="rongcloud-message_wrap">
                 <textarea
                 id="inputMsg"
@@ -70,15 +77,10 @@
                 ctrl-enter-keys fun="send()" ctrlenter="false"  ondrop="return false;"
                 ng-model="currentConversation.messageContent"
                  placeholder="请输入文字..."></textarea>
-                <!-- <pre id="inputMsg" class="rongcloud-text rongcloud-grey" contenteditable contenteditable-dire
-                ng-focus="showemoji=fase"
-                style='background-color: rgba(0,0,0,0);color:black;'
-                ctrl-enter-keys fun="send()" ctrlenter="false" placeholder="请输入文字..." ondrop="return false;"
-                ng-model="currentConversation.messageContent"></pre> -->
+                
             </div>
-            <a href="#" class="rongcloud-pull-right rongcloud-message_type_btn rongcloud-message_type_btn2"  ng-show="_inputPanelState==0">
-                <i class="rongcloud-sprite2 rongcloud-message_emoji_btn" ng-click="showemoji=!showemoji"></i>
-            </a>
+
+            
           </div>
 
 
