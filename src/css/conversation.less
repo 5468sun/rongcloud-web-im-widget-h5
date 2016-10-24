@@ -1,84 +1,107 @@
-@charset "utf-8";
-/*
-	------------Reset--------------
-*/
-html,body,h1,h2,h3,h4,h5,h6,p,a,em,input,img,i,b,ul,li,dl,dd,dt,hr,textarea{
-    margin:0;
-    padding:0;
-    list-style:none;
-    outline:none;
-    border:0;
-    font-style:normal;
-    font-weight:normal;
-}
-html{
-    font-size:62.5%;
-    min-width:320px;
-    overflow-y:scroll;
-    overflow-x:hidden;
-    -webkit-overflow-scrolling:touch;
-}
-body{
-    font-family: "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+/*reset*/
+body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,form,fieldset,legend,button,input,textarea,th,td{margin:0;padding:0;}body,button,input,select,textarea{font:28px/1 Helvetica,sans-serif;line-height:1;}h1,h2,h3,h4,h5,h6{font-size:100%;}address,cite,dfn,em,var{font-style:normal;}code,kbd,pre,samp{font-family:courier new,courier,monospace;}small{font-size:24px;}ul,ol{list-style:none;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}legend{color:#000;}fieldset,img{border:0;}button,input,select,textarea{font-size:100%;}table{border-collapse:collapse;border-spacing:0;}
+*, *:before, *:after {box-sizing: border-box;}:focus {outline: 0;}
+body * {max-height: 1000000px;}//fix font boosting
+input[type="submit"],input[type="reset"],input[type="button"],button {-webkit-appearance: none;}
+h1,h2,h3,h4,h5,h6{font-weight:normal;}
+html{background:#ffffff;color:#333333;}
+body{font-size:32px;/*px*/background-color: #ffffff;color:#333333;font-family:Helvetica,sans-serif;}
+.bttn{background:Transparent;border:none;cursor:pointer;*overflow:visible;}
+.bttn.disabled{background-color: #cccccc;}
+a:link,a:visited,a:hover,a:active{text-decoration:none;}
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+
+html,body{
     width: 100%;
     height: 100%;
+    position: relative;
 }
-
-/*
-	------------Reset   End--------------
-*/
-
+.loading{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -2em;
+}
 .rongcloud-sprite{
     background: url(../images/icon.png) no-repeat;
     background-size: 2.4rem auto;
 }
 .rongcloud-sprite2{background: url(../images/icon2.png) no-repeat;background-size: 3.6rem auto;}
+
+.rongWidget{
+    width: 100%;
+    height: 100%;
+}
+
 /* header */
 .rongcloud-header{
     width: 100%;
-    height: 1.8rem;
-    line-height:1.8rem;
-    font-size:16px;
+    height: 90px;
+    font-size:28px;
     background: #0099ff;
-    position: fixed;
-    top: 0;
-    z-index: 999;
     text-align:center;
-    display: -webkit-box;
-    -webkit-box-sizing: border-box;
-    -webkit-box-pack: justify;
-    /*overflow: hidden;*/
-    zoom: 1;
-    padding: 0 0.4rem;
-    cursor: pointer;
-    /*border-bottom: 1px solid #c9deec;*/
-}
-.rongcloud-header:after{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    content: '';
-    width: 100%;
-    height: 1px;
-    border-top: 1px solid #c9deec;
-    -webkit-transform: scaleY(0.5);
-}
-.rongcloud-header .rongcloud-btn-right,.rongcloud-header > span{
-    display: -webkit-box;
-    text-decoration: none;
-    text-shadow: 0,-1 ,0,rgba(0,0,0,5);
-    color: #00aff0;
-}
-.rongcloud-header .rongcloud-btn-left,.rongcloud-header .rongcloud-btn-right{
-    border: 0;
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+
+    
+
 }
 
-.rongcloud-header .rongcloud-btn-left{
-    background: none;
+.rongcloud-header .rongcloud-btn-left,.rongcloud-header .rongcloud-btn-right{
+    width: 90px;
+    height: 100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.rongcloud-header .rongcloud-btn-left img{
+    width: 30px;
+}
+
+.rongcloud-header .rongcloud-title{
+    flex: 1;
 }
 .rongcloud-header .rongcloud-title a{
     color: #fff;
     letter-spacing: .5px;
+}
+
+.rongcloud-main,.rongcloud-main_inner{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    z-index: 100;
+}
+
+.funcPanel{
+    border-top: 1px solid #ccc;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.funcPanel .rongcloud-message_type2_btn{
+    width: 90px;
+    height: 90px;
+    display: flex;
+    justify-content:center;
+    align-items:center;
+}
+.funcPanel .rongcloud-message_type2_btn .icon{
+    width: 60px;
+    height: 60px;
+}
+
+.funcPanel .rongcloud-message_wrap{
+    flex-grow: 1;
 }
 
 
@@ -326,12 +349,8 @@ body{
     display: inline-block;
 }
 #wrapper {
-    position: absolute;
-    z-index: 1;
-    top: 1.8rem;
-    bottom: 1.5rem;
-    left: 0;
     width: 100%;
+    flex-grow: 1;
     overflow: hidden;
     background-color: white;
 }
@@ -474,6 +493,7 @@ body{
     color: rgb(68, 68, 68);;
     word-break: break-all;
     word-wrap: break-word;
+    white-space: pre-wrap;
     /*background-color: transparent;*/
     border: none;
     /*border-radius: 0;*/
@@ -728,9 +748,7 @@ body{
 
 
 .rongcloud-footer{
-    position: fixed;
-    left: 0;
-    bottom: 0;
+    min-height: 90px;
     width: 100%;
     /*display: -webkit-box;*/
     text-align: center;
@@ -745,16 +763,7 @@ body{
     line-height: 0.9rem;
     padding: 0.3rem 0;
 }
-.rongcloud-footer:before{
-    position: absolute;
-    top: -1px;
-    left: 0;
-    content: '';
-    width: 100%;
-    height: 1px;
-    border-top: 1px solid #c9deec;
-    -webkit-transform: scaleY(0.5);
-}
+
 .rongcloud-footer a{
     display: block;
     /*-webkit-box-flex: 1;*/
@@ -802,11 +811,11 @@ body{
 }*/
 
 
-.rongcloud-footer .rongcloud-message_wrap{flex-grow:1;overflow: hidden;display: inline-block;}
+
 .rongcloud-footer .rongcloud-message_type_btn{ width: 1.5rem; /*height: 1.1rem;*/ border-right: 1px solid #abadbb;}
 .rongcloud-footer .rongcloud-message_type_btn2{ width: 1.5rem;padding-left: 0rem; padding-right: .2rem; border: none}
 
-.rongcloud-footer .rongcloud-message_type2_btn{ border: none; padding: 0 0.2rem}
+
 .rongcloud-footer a.rongcloud-message_type2_btn > span { color: #0099ff}
 .rongcloud-footer .rongcloud-message_type_btn i{
     width: 1rem;
