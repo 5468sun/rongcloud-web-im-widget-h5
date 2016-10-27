@@ -85,6 +85,24 @@ conversationServer.factory("conversationServer", ["$q", function($q: angular.IQS
 
 }]);
 
+conversationServer.factory("Product", ["$http","$q", function($http:any,$q: angular.IQService) {
+    return{
+        getProd:function(guid){
+            var deferred = $q.defer();
+            $http.post("/Ajax/Product/GetProductSpec.ashx",{prodGuid:guid}).then(function(result){
+                if(result.data.msg == "获取成功"){
+                    deferred.resolve(result.data.product);
+                }else{
+                     deferred.reject(result.data.msg);
+                }
+            }).catch(function(reason){
+                deferred.reject(reason);
+            });
+            return deferred.promise;
+        }
+    }
+}]);
+
 interface ConversationServer {
     current: WidgetModule.Conversation
     _customService: {

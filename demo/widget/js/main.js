@@ -12584,8 +12584,8 @@ angular.module('ng-iscroll', []).directive('ngIscroll', function ()
 /// <reference path="../../lib/window.d.ts"/>
 var conversationController = angular.module("RongWebIMWidget.conversationController", ["RongWebIMWidget.conversationServer"]);
 conversationController.controller("conversationController", ["$scope",
-    "conversationServer", "WebIMWidget", "conversationListServer", "widgetConfig", "providerdata",
-    function ($scope, conversationServer, WebIMWidget, conversationListServer, widgetConfig, providerdata) {
+    "conversationServer", "WebIMWidget", "conversationListServer", "widgetConfig", "providerdata", "Product",
+    function ($scope, conversationServer, WebIMWidget, conversationListServer, widgetConfig, providerdata, Product) {
         var ImageDomain = "http://7xogjk.com1.z0.glb.clouddn.com/";
         var notExistConversation = true;
         var qiniuuploader;
@@ -12634,6 +12634,7 @@ conversationController.controller("conversationController", ["$scope",
             targetId: "",
             targetType: 0
         };
+        $scope.uploadingImgList = [];
         $scope.messageList = [];
         $scope.messageContent = "";
         $scope.WebIMWidget = WebIMWidget;
@@ -12643,9 +12644,11 @@ conversationController.controller("conversationController", ["$scope",
         $scope.showSelf = false;
         //显示表情
         $scope.showemoji = false;
+        $scope.showMoreOpt = false;
         document.getElementById("wrapper").addEventListener("touchstart", function () {
             $scope.$apply(function () {
                 $scope.showemoji = false;
+                $scope.showMoreOpt = false;
             });
         });
         $scope.$watch("showemoji", function (newVal, oldVal) {
@@ -12674,13 +12677,8 @@ conversationController.controller("conversationController", ["$scope",
                 return;
             }
             if (newVal == WidgetModule.InputPanelType.person) {
-                setTimeout(function () {
-                    qiniuuploader && qiniuuploader.destroy();
-                    uploadFileInit();
-                });
             }
             else {
-                qiniuuploader && qiniuuploader.destroy();
             }
         });
         $scope.$watch("showSelf", function (newVal, oldVal) {
@@ -12689,13 +12687,8 @@ conversationController.controller("conversationController", ["$scope",
             }
             if (newVal) {
                 $scope.refreshiScroll();
-                setTimeout(function () {
-                    qiniuuploader && qiniuuploader.destroy();
-                    uploadFileInit();
-                }, 1000);
             }
             else {
-                qiniuuploader && qiniuuploader.destroy();
             }
         });
         conversationServer.onConversationChangged = function (conversation) {
@@ -12866,9 +12859,14 @@ conversationController.controller("conversationController", ["$scope",
             RongIMLib.RongIMClient.getInstance().getFileToken(RongIMLib.FileType.IMAGE, {
                 onSuccess: function (data) {
                     conversationServer._uploadToken = data.token;
-                    setTimeout(function () {
-                        uploadFileInit();
-                    }, 1000);
+                    var prodGuid = getUrlVar("prodGuid");
+                    if (prodGuid) {
+                        $scope.sendProd(prodGuid);
+                    }
+                    // setTimeout(function() {
+                    //     console.log($("#uploadfile").length);console.log($("#uploadfile").width());console.log($("#uploadfile").height());
+                    //     uploadFileInit();
+                    // }, 1000);
                 }, onError: function () {
                 }
             });
@@ -13089,16 +13087,56 @@ conversationController.controller("conversationController", ["$scope",
                 }
             });
         };
+        $scope.onInputElmFocus = function () {
+            //$scope.showemoji = !$scope.showemoji;
+            if ($scope.showMoreOpt) {
+                $scope.showMoreOpt = false;
+            }
+        };
+        $scope.toggleEmojiKeyboard = function () {
+            $scope.showemoji = !$scope.showemoji;
+            if ($scope.showMoreOpt) {
+                $scope.showMoreOpt = false;
+            }
+        };
+        $scope.toggleMoreOptions = function () {
+            if ($scope.showemoji) {
+                $scope.showemoji = !$scope.showemoji;
+            }
+            if ($scope.showMoreOpt) {
+                $scope.showMoreOpt = false;
+            }
+            else {
+                $scope.showMoreOpt = true;
+                setTimeout(function () { uploadFileInit(); }, 500);
+            }
+        };
+        $scope.removeUploadingImg = function (file) {
+            return;
+            // qiniuuploader.stop();
+            // qiniuuploader.removeFile(file);
+            // qiniuuploader.start();
+            // $.each($scope.uploadingImgList,function(index,item){
+            //     if(item.id == file.id){
+            //         $scope.uploadingImgList.splice(index,1);
+            //         return false;
+            //     }
+            // });
+            // console.log(qiniuuploader.files);
+        };
         var refreshToken = setInterval(function () {
             conversationServer._onConnectSuccess();
         }, 10 * 60 * 1000);
         function uploadFileInit() {
+            if (qiniuuploader) {
+                return;
+            }
             qiniuuploader = Qiniu.uploader({
                 // runtimes: 'html5,flash,html4',
                 runtimes: 'html5,html4',
                 browse_button: 'uploadfile',
                 // browse_button: 'upload',
-                container: 'funcPanel',
+                //container: 'funcPanel',
                 drop_element: 'Messages',
                 max_file_size: '100mb',
                 // flash_swf_url: '/widget/images/Moxie.swf',
@@ -13115,20 +13153,45 @@ conversationController.controller("conversationController", ["$scope",
                 },
                 multi_selection: false,
                 auto_start: true,
+                resize: { width: 750, height: 750, quality: 70, crop: false },
                 init: {
                     'FilesAdded': function (up, files) {
+                        $.each(files, function (index, file) {
+                            WidgetModule.Helper.ImageHelper.getThumbnail(files[0].getNative(), 60000, function (obj, data) {
+                                file.dataImg = data;
+                                //$timeout(,1000);
+                                $scope.$apply(function () {
+                                    $scope.uploadingImgList.push(file);
+                                });
+                            });
+                        });
+                        $scope.$apply(function () {
+                            $scope.showMoreOpt = false;
+                        });
                     },
                     'BeforeUpload': function (up, file) {
+                        if (!$scope.currentConversation.targetId || !$scope.currentConversation.targetType) {
+                            $scope.uploadingImgList = [];
+                            alert("请先选择一个会话目标。");
+                            return;
+                        }
                     },
                     'UploadProgress': function (up, file) {
+                        console.log(file);
+                        $scope.$apply();
                     },
                     'UploadComplete': function () {
                     },
                     'FileUploaded': function (up, file, info) {
-                        if (!$scope.currentConversation.targetId || !$scope.currentConversation.targetType) {
-                            alert("请先选择一个会话目标。");
-                            return;
-                        }
+                        $.each($scope.uploadingImgList, function (index, item) {
+                            if (item.id == file.id) {
+                                //$timeout(,1000);
+                                $scope.$apply(function () {
+                                    $scope.uploadingImgList.splice(index, 1);
+                                });
+                                return false;
+                            }
+                        });
                         info = JSON.parse(info);
                         RongIMLib.RongIMClient.getInstance().getFileUrl(RongIMLib.FileType.IMAGE, file.target_name, {
                             onSuccess: function (url) {
@@ -13153,10 +13216,70 @@ conversationController.controller("conversationController", ["$scope",
                         });
                     },
                     'Error': function (up, err, errTip) {
+                        console.log(errTip);
                     }
                 }
             });
         }
+        function getUrlVar(name) {
+            var url = document.URL;
+            var oRegex = new RegExp('[\?&]' + name + '=([^&]+)', 'i');
+            var oMatch = oRegex.exec(url);
+            if (oMatch && oMatch.length > 1)
+                return oMatch[1];
+            else
+                return '';
+        }
+        $scope.sendProd = function (guid) {
+            //Product.getProd(prodGuid).then(function(product){
+            //         var prodName = product.ProductName;
+            //         var prodGuid = prodGuid;
+            //         var prodImg = product.ProductSpec[0].image;
+            //     });
+            if (!$scope.currentConversation.targetId || !$scope.currentConversation.targetType) {
+                alert("请先选择一个会话目标。");
+                return;
+            }
+            var prodName = "产品标题";
+            var prodDesc = "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";
+            var prodGuid = "xxxx-xxx-xxxx-xxx";
+            var prodImg = "http://ic1.zhendeyouliao.com/UpFiles/Images/Product/16011319522973394.jpg";
+            var urlPrefix = window.location.protocol + "//" + window.location.host;
+            var prodUrl = urlPrefix + "/Product/ProductIntro.aspx?guid=" + prodGuid;
+            var con = "询问：" + prodName + "\n" + prodUrl;
+            var msg = RongIMLib.TextMessage.obtain(con);
+            var userinfo = new RongIMLib.UserInfo(conversationServer.loginUser.id, conversationServer.loginUser.name, conversationServer.loginUser.portraitUri);
+            msg.user = userinfo;
+            RongIMLib.RongIMClient.getInstance().sendMessage(+$scope.currentConversation.targetType, $scope.currentConversation.targetId, msg, {
+                onSuccess: function (retMessage) {
+                    conversationListServer.updateConversations().then(function () {
+                    });
+                },
+                onError: function (error) {
+                    console.log(error);
+                }
+            });
+            var content = packDisplaySendMessage(msg, WidgetModule.MessageType.TextMessage);
+            var cmsg = WidgetModule.Message.convert(content);
+            conversationServer._addHistoryMessages(cmsg);
+            $scope.refreshiScroll();
+            // var im = RongIMLib.RichContentMessage.obtain(prodName, prodDesc, prodImg,"");
+            // var content = packDisplaySendMessage(im, WidgetModule.MessageType.RichContentMessage);
+            // RongIMLib.RongIMClient.getInstance().sendMessage($scope.currentConversation.targetType, $scope.currentConversation.targetId, im, {
+            //     onSuccess: function() {
+            //         console.log("onSuccess");
+            //         conversationListServer.updateConversations().then(function() {});
+            //     },
+            //     onError: function() {
+            //         console.log("onError");
+            //     }
+            // });
+            // conversationServer._addHistoryMessages(WidgetModule.Message.convert(content));
+            // if(!$scope.$$phase){
+            //     $scope.$apply();
+            // }
+            // $scope.refreshiScroll();
+        };
     }]);
 /// <reference path="../../../typings/tsd.d.ts"/>
 var conversationDirective = angular.module("RongWebIMWidget.conversationDirective", ["RongWebIMWidget.conversationController"]);
@@ -13180,6 +13303,7 @@ conversationDirective.directive("rongConversation", [function () {
 conversationDirective.directive("swipeEmoji", [function () {
         return {
             restrict: "E",
+            replace: true,
             scope: {
                 content: "="
             },
@@ -13233,17 +13357,18 @@ conversationDirective.directive("swipeEmoji", [function () {
 conversationDirective.directive("emoji", [function () {
         return {
             restrict: "E",
+            replace: true,
             scope: {
                 item: "=",
                 content: "="
             },
-            template: '<div style="display:inline-block"></div>',
+            template: '<div class="emojiItem"></div>',
             link: function (scope, ele, attr) {
-                ele.find("div").append(scope.item);
+                ele.append(scope.item);
                 ele.on("click", function (e) {
                     scope.content.messageContent = scope.content.messageContent || "";
                     scope.content.messageContent = scope.content.messageContent.replace(/\n$/, "");
-                    scope.content.messageContent = scope.content.messageContent + scope.item.children[0].getAttribute("name");
+                    scope.content.messageContent = scope.content.messageContent + scope.item.getAttribute("name");
                     scope.$parent.$apply();
                     e.preventDefault();
                 });
@@ -13353,27 +13478,25 @@ conversationDirective.directive("ctrlEnterKeys", ["$timeout", function ($timeout
 conversationDirective.directive("textmessage", [function () {
         return {
             restrict: "E",
+            replace: true,
             scope: { msg: "=" },
-            template: '<div class="">' +
-                '<div class="rongcloud-Message-text">' +
-                '<div class="rongcloud-arrow-dialog"></div>' +
+            template: '<div class="rongcloud-Message-text">' +
+                //'<div class="rongcloud-arrow-dialog"></div>' +
                 // '<i class="sprite"></i>' +
                 '<pre class="rongcloud-Message-entry rongcloud-userMsg" ng-bind-html="msg.content|trustHtml"><br></pre>' +
-                '</div>' +
                 '</div>'
         };
     }]);
 conversationDirective.directive("imagemessage", [function () {
         return {
             restrict: "E",
+            replace: true,
             scope: { msg: "=" },
-            template: '<div class="">' +
-                '<div class="rongcloud-Message-img">' +
+            template: '<div class="rongcloud-Message-img">' +
                 '<span id="{{\'rebox_\'+$id}}" class="rongcloud-Message-entry" style="">' +
                 // '<img src="images/barBg.png" alt=""/>' +
                 '<a href="{{msg.imageUri}}"><img ng-src="{{msg.content}}"  data-image="{{msg.imageUri}}" alt=""/></a>' +
                 '</span>' +
-                '</div>' +
                 '</div>',
             link: function (scope, ele, attr) {
                 var img = new Image();
@@ -13405,26 +13528,24 @@ conversationDirective.directive("imagemessage", [function () {
 conversationDirective.directive("includinglinkmessage", [function () {
         return {
             restrict: "E",
+            replace: true,
             scope: { msg: "=" },
-            template: '<div class="">' +
-                '<div class="rongcloud-Message-text">' +
+            template: '<div class="rongcloud-Message-text">' +
                 '<pre class="rongcloud-Message-entry" style="">' +
                 '维护中 由于我们的服务商出现故障，融云官网及相关服务也受到影响，给各位用户带来的不便，还请谅解。  您可以通过 <a href="#">【官方微博】</a>了解</pre>' +
-                '</div>' +
                 '</div>'
         };
     }]);
 conversationDirective.directive("voicemessage", ["$timeout", function ($timeout) {
         return {
             restrict: "E",
+            replace: true,
             scope: { msg: "=" },
-            template: '<div class="">' +
-                '<div class="rongcloud-Message-audio">' +
+            template: '<div class="rongcloud-Message-audio">' +
                 '<span class="rongcloud-Message-entry" style="">' +
                 '<span class="rongcloud-audioBox rongcloud-clearfix " ng-click="play()" ng-class="{\'rongcloud-animate\':isplaying}" ><i></i><i></i><i></i></span>' +
                 '<div style="display: inline-block;" ><span class="rongcloud-audioTimer">{{msg.duration}}”</span><span class="rongcloud-audioState" ng-show="msg.isUnReade"></span></div>' +
                 '</span>' +
-                '</div>' +
                 '</div>',
             link: function (scope, ele, attr) {
                 scope.msg.duration = parseInt(scope.msg.duration || scope.msg.content.length / 1024);
@@ -13453,25 +13574,24 @@ conversationDirective.directive("voicemessage", ["$timeout", function ($timeout)
 conversationDirective.directive("locationmessage", [function () {
         return {
             restrict: "E",
+            replace: true,
             scope: { msg: "=" },
-            template: '<div class="">' +
-                '<div class="rongcloud-Message-map">' +
+            template: '<div class="rongcloud-Message-map">' +
                 '<span class="rongcloud-Message-entry" style="">' +
                 '<div class="rongcloud-mapBox">' +
                 '<img ng-src="{{msg.content}}" alt="">' +
                 '<span>{{msg.poi}}</span>' +
                 '</div>' +
                 '</span>' +
-                '</div>' +
                 '</div>'
         };
     }]);
 conversationDirective.directive("richcontentmessage", [function () {
         return {
             restrict: "E",
+            replace: true,
             scope: { msg: "=" },
-            template: '<div class="">' +
-                '<div class="rongcloud-Message-image-text">' +
+            template: '<div class="rongcloud-Message-image-text">' +
                 '<span class="rongcloud-Message-entry" style="">' +
                 '<div class="rongcloud-image-textBox">' +
                 '<h4>{{msg.title}}</h4>' +
@@ -13481,7 +13601,6 @@ conversationDirective.directive("richcontentmessage", [function () {
                 '</div>' +
                 '</div>' +
                 '</span>' +
-                '</div>' +
                 '</div>'
         };
     }]);
@@ -13549,6 +13668,24 @@ conversationServer.factory("conversationServer", ["$q", function ($q) {
             human: {}
         };
         return conversationServer;
+    }]);
+conversationServer.factory("Product", ["$http", "$q", function ($http, $q) {
+        return {
+            getProd: function (guid) {
+                var deferred = $q.defer();
+                $http.post("/Ajax/Product/GetProductSpec.ashx", { prodGuid: guid }).then(function (result) {
+                    if (result.data.msg == "获取成功") {
+                        deferred.resolve(result.data.product);
+                    }
+                    else {
+                        deferred.reject(result.data.msg);
+                    }
+                }).catch(function (reason) {
+                    deferred.reject(reason);
+                });
+                return deferred.promise;
+            }
+        };
     }]);
 /// <reference path="../../../typings/tsd.d.ts"/>
 var conversationListCtr = angular.module("RongWebIMWidget.conversationListController", []);
@@ -13956,11 +14093,11 @@ var widget = angular.module("RongWebIMWidget", ["RongWebIMWidget.conversationSer
 ]);
 widget.run(["$http", "WebIMWidget", "widgetConfig", "RongKefu", function ($http, WebIMWidget, widgetConfig, RongKefu) {
         var protocol = location.protocol === "https:" ? "https:" : "http:";
-        $script.get(protocol + "//cdn.ronghub.com/RongIMLib-2.2.1.min.js", function () {
-            $script.get(protocol + "//cdn.ronghub.com/RongEmoji-2.2.1.min.js", function () {
+        $script.get(protocol + "//test1.zhendeyouliao.com/imkefu/lib/RongIMLib-kefu.js", function () {
+            $script.get("/widget/lib/RongEmoji.js", function () {
                 RongIMLib.RongIMEmoji && RongIMLib.RongIMEmoji.init();
             });
-            $script.get(protocol + "//cdn.ronghub.com/RongIMVoice-2.2.1.min.js", function () {
+            $script.get("/widget/lib/RongIMVoice.js", function () {
                 RongIMLib.RongIMVoice && RongIMLib.RongIMVoice.init();
             });
             if (widgetConfig.config) {
@@ -13974,17 +14111,6 @@ widget.run(["$http", "WebIMWidget", "widgetConfig", "RongKefu", function ($http,
         });
         $script.get(protocol + "//cdn.bootcss.com/plupload/2.1.8/plupload.full.min.js", function () { });
     }]);
-// $(function() {
-//     //rem
-//     var winW = document.documentElement.clientWidth;
-//     var desW = 1242;
-//     var fontSize = 100;
-//     var rem = desW / fontSize;
-//     if (winW > desW) {
-//         winW = desW;
-//     }
-//     document.documentElement.style.fontSize = winW / rem + 'px';
-// })
 widget.factory("providerdata", [function () {
         var obj = {
             _cacheUserInfo: [],
@@ -14923,12 +15049,12 @@ angular.module('RongWebIMWidget').run(['$templateCache', function($templateCache
   'use strict';
 
   $templateCache.put('./src/ts/conversation/conversation.tpl.html',
-    "<div id=rong-conversation class=\"rongcloud-main rongcloud-kefuList\" ng-show=showSelf><evaluatedir type=evaluate.type display=evaluate.showevaluate confirm=evaluate.onConfirm(data) cancle=evaluate.onCancle()></evaluatedir><div class=rongcloud-main_inner><header class=rongcloud-header><a class=rongcloud-btn-left href=\"javascript:void 0\" ng-click=close()><img src=../widget/images/arrow-left.png alt=\"\"></a><div class=rongcloud-title><a class=\"rongcloud-title_name rongcloud-online\"><i class=rongcloud-Presence></i>{{currentConversation.title}}</a></div><a class=rongcloud-btn-right href=\"javascript:void 0\"></a></header><div id=wrapper ng-iscroll><div id=scroller><div id=Messages><div class=\"rongcloud-MessagesInner rongcloud-message-scroll\"><div class=rongcloud-Message-wrapper><div ng-repeat=\"item in messageList\" ng-switch=item.panelType><div class=rongcloud-Messages-date ng-switch-when=104><b>{{item.sentTime|historyTime}}</b></div><div class=rongcloud-Messages-date ng-switch-when=105><b my-tap=getHistory()>查看历史消息</b></div><div class=rongcloud-Messages-date ng-switch-when=106><b my-tap=getMoreMessage()>获取更多消息</b></div><div class=rongcloud-sys-tips ng-switch-when=2><span>{{item.content.content}}</span></div><div class=\"rongcloud-Message rongcloud-status1\" ng-switch-when=1 ng-class=\"{'rongcloud-youMsg':item.messageDirection==2,'rongcloud-myMsg':item.messageDirection==1}\"><div class=rongcloud-Messages-unreadLine></div><div><div class=rongcloud-Message-header><img class=\"rongcloud-img rongcloud-u-isActionable rongcloud-Message-avatar rongcloud-avatar\" ng-src=\"{{item.content.userInfo.portraitUri||'../widget/images/webBg.png'}}\" src=../widget/images/barBg.png alt=\"\"></div></div><div class=rongcloud-Message-body ng-switch=item.messageType><textmessage ng-switch-when=TextMessage msg=item.content></textmessage><imagemessage ng-switch-when=ImageMessage msg=item.content></imagemessage><voicemessage ng-switch-when=VoiceMessage msg=item.content></voicemessage><locationmessage ng-switch-when=LocationMessage msg=item.content></locationmessage><richcontentmessage ng-switch-when=RichContentMessage msg=item.content></richcontentmessage></div></div></div></div></div></div></div></div><footer class=rongcloud-footer><div id=funcPanel class=funcPanel><a href=# class=switchRenGongBtn ng-click=switchPerson() ng-show=\"_inputPanelState==2\"><img class=icon src=../widget/images/rengong.png alt=\"\"></a> <a href=# class=emojiBtn ng-show=\"_inputPanelState==0\" ng-click=\"showemoji=!showemoji\"><img class=icon src=../widget/images/emoji.png alt=\"\"></a> <a href=# class=keyboardBtn ng-show=\"_inputPanelState==0\" ng-click=\"showemoji=!showemoji\"><img class=icon src=../widget/images/rengong.png alt=\"\"></a><div class=rongcloud-message_wrap><textarea id=inputMsg ng-focus=\"showemoji=false\" ctrl-enter-keys fun=send() ctrlenter=false ondrop=\"return false\" ng-model=currentConversation.messageContent placeholder=请输入文字...></textarea></div></div><div class=rongcloud-pub-faces ng-show=showemoji><swipe-emoji content=currentConversation></swipe-emoji></div><div class=\"rongcloud-footerBtn rongcloud-clearfix\" ng-show=showemoji><ul class=\"rongcloud-clearfix rongcloud-emojiWrap\"><li class=rongcloud-sprite2></li></ul><a href=\"\" class=rongcloud-send_btn ng-click=send()>发送</a></div></footer></div></div>"
+    "<div id=rong-conversation class=\"rongcloud-main rongcloud-kefuList\" ng-show=showSelf><evaluatedir type=evaluate.type display=evaluate.showevaluate confirm=evaluate.onConfirm(data) cancle=evaluate.onCancle()></evaluatedir><div class=rongcloud-main_inner><header class=rongcloud-header><a class=btn-left href=\"javascript:void 0\" ng-click=close()><img class=icon src=../widget/images/arrow-left.png alt=\"\"></a><div class=title><a class=\"rongcloud-title_name rongcloud-online\"><i class=rongcloud-Presence></i>{{currentConversation.title}}</a></div><a class=btn-right href=\"javascript:void 0\"></a></header><div id=wrapper ng-iscroll><div id=scroller><div id=Messages class=messages><div class=\"rongcloud-MessagesInner rongcloud-message-scroll\"><div class=rongcloud-Message-wrapper><div ng-repeat=\"item in messageList\" ng-switch=item.panelType><div class=rongcloud-Messages-date ng-switch-when=104><b>{{item.sentTime|historyTime}}</b></div><div class=rongcloud-Messages-date ng-switch-when=105><b my-tap=getHistory()>查看历史消息</b></div><div class=rongcloud-Messages-date ng-switch-when=106><b my-tap=getMoreMessage()>获取更多消息</b></div><div class=rongcloud-sys-tips ng-switch-when=2><span>{{item.content.content}}</span></div><div class=rongcloud-Message ng-switch-when=1 ng-class=\"{'rongcloud-youMsg':item.messageDirection==2,'rongcloud-myMsg':item.messageDirection==1}\"><div class=rongcloud-Message-header><img class=rongcloud-Message-avatar ng-src=\"{{item.content.userInfo.portraitUri||'../widget/images/webBg.png'}}\" src=../widget/images/barBg.png alt=\"\"></div><div class=rongcloud-Message-body ng-switch=item.messageType><textmessage ng-switch-when=TextMessage msg=item.content></textmessage><imagemessage ng-switch-when=ImageMessage msg=item.content></imagemessage><voicemessage ng-switch-when=VoiceMessage msg=item.content></voicemessage><locationmessage ng-switch-when=LocationMessage msg=item.content></locationmessage><richcontentmessage ng-switch-when=RichContentMessage msg=item.content></richcontentmessage></div></div></div></div></div></div></div><ul class=uploadingImg ng-show=\"uploadingImgList.length>0\"><li ng-repeat=\"file in uploadingImgList\" ng-click=removeUploadingImg(file)><img ng-src=\"{{'data:image/png;base64,'+file.dataImg}}\" alt=\"\"><div class=mask style=\"width: {{100-file.percent+'%'}}\"></div><div class=percent><em>{{file.percent+'%'}}</em></div></li></ul></div><footer class=rongcloud-footer><div id=funcPanel class=funcPanel><a href=# class=\"btn-left switchRenGongBtn\" ng-click=switchPerson() ng-show=\"_inputPanelState==2\"><img class=icon src=../widget/images/rengong.svg alt=\"\"></a> <a href=# class=\"btn-left emojiBtn\" ng-show=\"_inputPanelState==0 && !showemoji\" ng-click=toggleEmojiKeyboard()><img class=icon src=../widget/images/emoji.svg alt=\"\"></a> <a href=# class=\"btn-left keyboardBtn\" ng-show=\"_inputPanelState==0 && showemoji\" ng-click=toggleEmojiKeyboard()><img class=icon src=../widget/images/keyboard.svg alt=\"\"></a><div class=rongcloud-message_wrap><textarea id=inputMsg ng-focus=onInputElmFocus() ctrl-enter-keys fun=send() ctrlenter=false ondrop=\"return false\" ng-model=currentConversation.messageContent placeholder=请输入文字...></textarea></div><a href=# class=\"btn-right othersBtn\" ng-click=toggleMoreOptions() ng-show=\"_inputPanelState==0 && currentConversation.messageContent.length==0\"><img class=icon src=../widget/images/others.svg alt=\"\"></a> <a href=# class=\"btn-right sendBtn\" ng-click=send() ng-show=\"_inputPanelState==2 || currentConversation.messageContent.length>0\"><img class=icon src=../widget/images/send.svg alt=\"\"></a></div><div class=rongcloud-pub-faces ng-show=showemoji><swipe-emoji content=currentConversation></swipe-emoji></div><div class=rongcloud-more-opt ng-show=showMoreOpt><ul class=options><li id=uploadfile><img class=opt src=../widget/images/image.svg alt=\"\"></li></ul></div></footer></div></div>"
   );
 
 
   $templateCache.put('./src/ts/conversation/swipeEmoji.tpl.html',
-    "<div class=rongcloud-swipe id=slider><div class=rongcloud-swipe-wrap><figure ng-repeat=\"item in data\"><emoji ng-repeat=\"it in item.emojis\" item=it content=$parent.content></emoji><span class=rongcloud-delete-emoji index=-1 alt=\"\" ng-click=delete()></span></figure></div><ol id=position class=rongcloud-ui-carousel-indicators><li ng-repeat=\"item in data\" ng-class=\"{'rongcloud-js-active':item.show}\"></li></ol></div>"
+    "<div class=rongcloud-swipe id=slider><div class=rongcloud-swipe-wrap><figure ng-repeat=\"item in data\"><emoji ng-repeat=\"it in item.emojis\" item=it content=$parent.content></emoji><span class=rongcloud-delete-emoji index=-1 alt=\"\" ng-click=delete()><img class=icon src=../widget/images/delete.svg alt=\"\"></span></figure></div><ol id=position class=rongcloud-ui-carousel-indicators><li ng-repeat=\"item in data\" ng-class=\"{'rongcloud-js-active':item.show}\"></li></ol></div>"
   );
 
 
@@ -14943,7 +15069,7 @@ angular.module('RongWebIMWidget').run(['$templateCache', function($templateCache
 
 
   $templateCache.put('./src/ts/main.tpl.html',
-    "<div class=rongWidget><rong-conversation></rong-conversation></div>"
+    "<div class=rongWidget><rong-conversation></rong-conversation><rong-conversation-list></rong-conversation-list></div>"
   );
 
 }]);

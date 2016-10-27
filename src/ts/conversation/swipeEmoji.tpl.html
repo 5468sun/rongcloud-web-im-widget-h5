@@ -2,7 +2,7 @@
   <div class="rongcloud-swipe-wrap">
     <figure  ng-repeat="item in data">
       <emoji ng-repeat="it in item.emojis"  item="it" content="$parent.content"></emoji>
-      <span class="rongcloud-delete-emoji" index="-1" alt="" ng-click="delete()"></span>
+      <span class="rongcloud-delete-emoji" index="-1" alt="" ng-click="delete()"><img class="icon" src="../widget/images/delete.svg" alt=""></span>
     </figure>
   </div>
   <ol id="position" class="rongcloud-ui-carousel-indicators">

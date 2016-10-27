@@ -37,6 +37,12 @@ module.exports = function(grunt) {
             cwd: "./src/images/",
             src: "./**",
             dest: "./build/images/"
+          },
+          {
+            expand: true,
+            flatten: true, 
+            src:['./bower_components/lib-flexible/build/flexible.js','./src/lib/RongIMLib.js','./src/lib/RongIMLib-kefu.js','./src/lib/RongEmoji.js','./src/lib/RongIMVoice.js'],
+            dest:'./build/lib/'
           }
         ]
       },
@@ -47,6 +53,12 @@ module.exports = function(grunt) {
             cwd: "./src/images/",
             src: "./**",
             dest: "./dist/images/"
+          },
+          {
+            expand: true,
+            flatten: true, 
+            src:['./bower_components/lib-flexible/build/flexible.js','./src/lib/RongIMLib.js','./src/lib/RongIMLib-kefu.js','./src/lib/RongEmoji.js','./src/lib/RongIMVoice.js'],
+            dest:'./dist/lib/'
           }
         ]
       }
@@ -111,12 +123,10 @@ module.exports = function(grunt) {
               './bower_components/ng-iscroll/src/ng-iscroll.js',
               './temp/main.js','./temp/myAppHTMLCache.js',
               './vendor/loadscript/script.min.js','./vendor/qiniu/qiniu.js'],
-            dest:'./build/main.js'
+            dest:'./build/js/main.js'
           },
-          {
-            src:['./bower_components/lib-flexible/build/flexible.js'],
-            dest:'./build/flexible.js'
-          },
+          
+
           {
             src:[
               './vendor/jqueryrebox/jquery-rebox.css',
@@ -138,11 +148,7 @@ module.exports = function(grunt) {
               './bower_components/ng-iscroll/src/ng-iscroll.min.js',
               './temp/main.js','./temp/myAppHTMLCache.js',
             './vendor/loadscript/script.min.js','./vendor/qiniu/qiniu.js'],
-            dest:'./dist/main.js'
-          },
-          {
-            src:['./bower_components/lib-flexible/build/flexible.js'],
-            dest:'./dist/flexible.js'
+            dest:'./dist/js/main.js'
           },
           {
             src:[
@@ -152,6 +158,44 @@ module.exports = function(grunt) {
           }
         ]
       }
+    },
+    less:{
+      build:{
+        options: {
+          paths: ['./src/css/']
+        },
+        files: {
+          './src/css/conversation.css': './src/css/conversation.less'
+        }
+      },
+      release:{
+        options: {
+          paths: ['./src/css/']
+        },
+        files: {
+          './src/css/conversation.css': './src/css/conversation.less'
+        }
+      }
+    },
+    autoprefixer:{
+      build:{
+        options:{
+        browsers: ['last 2 Chrome versions', 'Android 2.3']
+      },
+      single_file: {
+          src: './src/css/conversation.css',
+          dest: './src/css/conversation.css'
+      }
+    },
+    release:{
+      options:{
+        browsers: ['last 2 Chrome versions', 'Android 2.3']
+      },
+      single_file: {
+          src: './src/css/conversation.css',
+          dest: './src/css/conversation.css'
+      }
+    }
     },
     uglify:{
       build:{
@@ -207,17 +251,19 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-angular-templates');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-autoprefixer');
 
   grunt.registerTask("default", function() {
     grunt.log.writeln("env" + process.env.path);
   });
 
   grunt.registerTask("build", ["clean:build", "typescript:build",
-    "ngtemplates:app","concat:build", "copy:build","clean:temp","uglify:build","cssmin:build"
+    "ngtemplates:app", "less:build", "concat:build", "copy:build","clean:temp","autoprefixer:build","uglify:build","cssmin:build"
   ]);
 
   grunt.registerTask("release", ["clean:release", "typescript:release",
-    "ngtemplates:app","concat:release", "copy:release","clean:temp","uglify:release","cssmin:release"
+    "ngtemplates:app","less:release","concat:release", "copy:release","clean:temp","autoprefixer:release","uglify:release","cssmin:release"
   ]);
 
 

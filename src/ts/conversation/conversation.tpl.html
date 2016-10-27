@@ -2,18 +2,18 @@
     <evaluatedir type="evaluate.type" display="evaluate.showevaluate" confirm="evaluate.onConfirm(data)" cancle="evaluate.onCancle()"></evaluatedir>
     <div class="rongcloud-main_inner">
         <header class="rongcloud-header">
-            <a class="rongcloud-btn-left" href="javascript:void 0" ng-click="close()">
-              <img src="../widget/images/arrow-left.png" alt=""/>
+            <a class="btn-left" href="javascript:void 0" ng-click="close()">
+              <img class="icon" src="../widget/images/arrow-left.png" alt=""/>
             </a>
-            <div class="rongcloud-title">
+            <div class="title">
                 <a class="rongcloud-title_name rongcloud-online"><i class="rongcloud-Presence"></i>{{currentConversation.title}}</a>
             </div>
-            <a class="rongcloud-btn-right" href="javascript:void 0"></a>
+            <a class="btn-right" href="javascript:void 0"></a>
         </header>
         <!-- <div id="wrapper" class="" ng-style="wrapperbottom"> -->
           <div id="wrapper" ng-iscroll>
           <div id="scroller">
-            <div id="Messages" class=""> <!-- empty -->
+            <div id="Messages" class="messages"> <!-- empty -->
                 <div class="rongcloud-MessagesInner rongcloud-message-scroll">
                     <div class="rongcloud-Message-wrapper">
                         <div ng-repeat="item in messageList"  ng-switch="item.panelType">
@@ -24,12 +24,10 @@
                           <div class="rongcloud-Messages-date" ng-switch-when="106"><b class=""  my-tap="getMoreMessage()">获取更多消息</b></div>
 
                           <div class="rongcloud-sys-tips" ng-switch-when="2" ><span>{{item.content.content}}</span></div>
-                          <div class="rongcloud-Message rongcloud-status1" ng-switch-when="1" ng-class="{'rongcloud-youMsg':item.messageDirection==2,'rongcloud-myMsg':item.messageDirection==1}">
-                              <div class="rongcloud-Messages-unreadLine"></div>
-                              <div>
-                                  <div class="rongcloud-Message-header"><img class="rongcloud-img rongcloud-u-isActionable rongcloud-Message-avatar rongcloud-avatar" ng-src="{{item.content.userInfo.portraitUri||'../widget/images/webBg.png'}}" src="../widget/images/barBg.png" alt="">
+                          <div class="rongcloud-Message" ng-switch-when="1" ng-class="{'rongcloud-youMsg':item.messageDirection==2,'rongcloud-myMsg':item.messageDirection==1}">
+                              <!-- <div class="rongcloud-Messages-unreadLine"></div> -->
+                              <div class="rongcloud-Message-header"><img class="rongcloud-Message-avatar" ng-src="{{item.content.userInfo.portraitUri||'../widget/images/webBg.png'}}" src="../widget/images/barBg.png" alt="">
                                   </div>
-                              </div>
                               <div class="rongcloud-Message-body"  ng-switch="item.messageType">
                                   <!-- <div class="">
                                       <div class="rongcloud-Message-text">
@@ -44,14 +42,21 @@
                                   <locationmessage ng-switch-when="LocationMessage" msg="item.content"></locationmessage>
                                   <richcontentmessage ng-switch-when="RichContentMessage" msg="item.content"></richcontentmessage>
                               </div>
-                          </div>
+                          </div>   
                         </div>
                     </div>
                 </div>
             </div>
           </div>
-        </div>
 
+          <ul class="uploadingImg" ng-show="uploadingImgList.length>0">
+              <li ng-repeat="file in uploadingImgList" ng-click="removeUploadingImg(file)">
+              <img ng-src="{{'data:image/png;base64,'+file.dataImg}}" alt="">
+              <div class="mask" style="width: {{100-file.percent+'%'}}"></div>
+              <div class="percent"><em>{{file.percent+'%'}}</em></div>
+              </li>
+            </ul>
+        </div>
         <!-- footer -->
         <footer  class="rongcloud-footer">
           <div id="funcPanel" class="funcPanel">
@@ -60,40 +65,51 @@
                 </i>
             </a> -->
 
-            <a href="#" class="switchRenGongBtn" ng-click="switchPerson()" ng-show="_inputPanelState==2"> <!-- 机器 -->
-                <img class="icon" src="../widget/images/rengong.png" alt="">
+            <a href="#" class="btn-left switchRenGongBtn" ng-click="switchPerson()" ng-show="_inputPanelState==2"> <!-- 机器 -->
+                <img class="icon" src="../widget/images/rengong.svg" alt="">
             </a>
-            <a href="#" class="emojiBtn"  ng-show="_inputPanelState==0" ng-click="showemoji=!showemoji"><!-- 人工 表情 -->
-                <img class="icon" src="../widget/images/emoji.png" alt="">
+            <a href="#" class="btn-left emojiBtn"  ng-show="_inputPanelState==0 && !showemoji" ng-click="toggleEmojiKeyboard()"><!-- 人工 表情 -->
+                <img class="icon" src="../widget/images/emoji.svg" alt="">
             </a>
-            <a href="#" class="keyboardBtn"  ng-show="_inputPanelState==0" ng-click="showemoji=!showemoji"><!-- 人工 键盘 -->
-                <img class="icon" src="../widget/images/rengong.png" alt="">
+            <a href="#" class="btn-left keyboardBtn"  ng-show="_inputPanelState==0 && showemoji" ng-click="toggleEmojiKeyboard()"><!-- 人工 键盘 -->
+                <img class="icon" src="../widget/images/keyboard.svg" alt="">
             </a>
 
             <div class="rongcloud-message_wrap">
                 <textarea
                 id="inputMsg"
-                ng-focus="showemoji=false"
+                ng-focus="onInputElmFocus()"
                 ctrl-enter-keys fun="send()" ctrlenter="false"  ondrop="return false;"
                 ng-model="currentConversation.messageContent"
                  placeholder="请输入文字..."></textarea>
                 
             </div>
 
-            
+            <a href="#" class="btn-right othersBtn" ng-click="toggleMoreOptions()" ng-show="_inputPanelState==0 && currentConversation.messageContent.length==0">
+                <img class="icon" src="../widget/images/others.svg" alt="">
+            </a>
+            <a href="#" class="btn-right sendBtn" ng-click="send()" ng-show="_inputPanelState==2 || currentConversation.messageContent.length>0">
+                <img class="icon" src="../widget/images/send.svg" alt="">
+            </a>
           </div>
 
 
             <div class="rongcloud-pub-faces" ng-show="showemoji">
                   <swipe-emoji content="currentConversation"></swipe-emoji>
             </div>
-
-            <div class="rongcloud-footerBtn rongcloud-clearfix" ng-show="showemoji">
+            
+            <div class="rongcloud-more-opt" ng-show="showMoreOpt">
+              <ul class="options">
+                <li id="uploadfile"><img class="opt" src="../widget/images/image.svg" alt=""></li>
+                <!-- <li class="currentProd" ng-click="sendProd('xxxx')"><img src="http://ic1.zhendeyouliao.com/UpFiles/Images/Product/16011319522973394.jpg" alt=""></li> -->
+              </ul>
+            </div>
+            <!-- <div class="rongcloud-footerBtn rongcloud-clearfix" ng-show="showemoji">
                 <ul class="rongcloud-clearfix rongcloud-emojiWrap">
                     <li class="rongcloud-sprite2"></li>
                 </ul>
                 <a href="" class="rongcloud-send_btn" ng-click="send()">发送</a>
             </div>
-        </footer>
+        </footer> -->
     </div>
 </div>

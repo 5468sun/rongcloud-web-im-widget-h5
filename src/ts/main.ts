@@ -8,11 +8,11 @@ var widget = angular.module("RongWebIMWidget", ["RongWebIMWidget.conversationSer
 widget.run(["$http", "WebIMWidget", "widgetConfig", "RongKefu", function($http: angular.IHttpService,
     WebIMWidget: WebIMWidget, widgetConfig: widgetConfig, RongKefu: KefuServer) {
     var protocol = location.protocol === "https:" ? "https:" : "http:";
-    $script.get(protocol + "//cdn.ronghub.com/RongIMLib-2.2.1.min.js", function() {
-        $script.get(protocol + "//cdn.ronghub.com/RongEmoji-2.2.1.min.js", function() {
+    $script.get(protocol + "//test1.zhendeyouliao.com/imkefu/lib/RongIMLib-kefu.js", function() { //cdn.ronghub.com/RongIMLib-2.2.1.min.js
+        $script.get("/widget/lib/RongEmoji.js", function() {
             RongIMLib.RongIMEmoji && RongIMLib.RongIMEmoji.init();
         });
-        $script.get(protocol + "//cdn.ronghub.com/RongIMVoice-2.2.1.min.js", function() {
+        $script.get("/widget/lib/RongIMVoice.js", function() {
             RongIMLib.RongIMVoice && RongIMLib.RongIMVoice.init();
         });
         if (widgetConfig.config) {
@@ -25,17 +25,7 @@ widget.run(["$http", "WebIMWidget", "widgetConfig", "RongKefu", function($http: 
     });
     $script.get(protocol + "//cdn.bootcss.com/plupload/2.1.8/plupload.full.min.js", function() { });
 }]);
-// $(function() {
-//     //rem
-//     var winW = document.documentElement.clientWidth;
-//     var desW = 1242;
-//     var fontSize = 100;
-//     var rem = desW / fontSize;
-//     if (winW > desW) {
-//         winW = desW;
-//     }
-//     document.documentElement.style.fontSize = winW / rem + 'px';
-// })
+
 
 widget.factory("providerdata", [function() {
     var obj = {

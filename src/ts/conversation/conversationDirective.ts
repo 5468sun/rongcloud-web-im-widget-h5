@@ -25,6 +25,7 @@ conversationDirective.directive("rongConversation", [function() {
 conversationDirective.directive("swipeEmoji", [function() {
     return {
         restrict: "E",
+        replace:true,
         scope: {
             content: "="
         },
@@ -84,18 +85,19 @@ conversationDirective.directive("swipeEmoji", [function() {
 conversationDirective.directive("emoji", [function() {
     return {
         restrict: "E",
+        replace:true,
         scope: {
             item: "=",
             content: "="
         },
-        template: '<div style="display:inline-block"></div>',
+        template: '<div class="emojiItem"></div>',
         link: function(scope: any, ele: angular.IRootElementService, attr: angular.IAttributes) {
 
-            ele.find("div").append(scope.item);
+            ele.append(scope.item);
             ele.on("click", function(e) {
                 scope.content.messageContent = scope.content.messageContent || "";
                 scope.content.messageContent = scope.content.messageContent.replace(/\n$/, "");
-                scope.content.messageContent = scope.content.messageContent + scope.item.children[0].getAttribute("name");
+                scope.content.messageContent = scope.content.messageContent + scope.item.getAttribute("name");
                 scope.$parent.$apply();
                 e.preventDefault();
             })
@@ -214,29 +216,27 @@ conversationDirective.directive("ctrlEnterKeys", ["$timeout", function($timeout:
 conversationDirective.directive("textmessage", [function() {
     return {
         restrict: "E",
+        replace:true,
         scope: { msg: "=" },
-        template: '<div class="">' +
-        '<div class="rongcloud-Message-text">' +
-        '<div class="rongcloud-arrow-dialog"></div>' +
+        template: '<div class="rongcloud-Message-text">' +
+        //'<div class="rongcloud-arrow-dialog"></div>' +
         // '<i class="sprite"></i>' +
         '<pre class="rongcloud-Message-entry rongcloud-userMsg" ng-bind-html="msg.content|trustHtml"><br></pre>' +
-        '</div>' +
-        '</div>'
+        '</div>' 
     }
 }]);
 
 conversationDirective.directive("imagemessage", [function() {
     return {
         restrict: "E",
+        replace:true,
         scope: { msg: "=" },
-        template: '<div class="">' +
-        '<div class="rongcloud-Message-img">' +
+        template: '<div class="rongcloud-Message-img">' +
         '<span id="{{\'rebox_\'+$id}}" class="rongcloud-Message-entry" style="">' +
         // '<img src="images/barBg.png" alt=""/>' +
         '<a href="{{msg.imageUri}}"><img ng-src="{{msg.content}}"  data-image="{{msg.imageUri}}" alt=""/></a>' +
         '</span>' +
-        '</div>' +
-        '</div>',
+        '</div>' ,
         link: function(scope: any, ele: angular.IRootElementService, attr: any) {
             var img = new Image();
             img.src = scope.msg.imageUri;
@@ -268,13 +268,12 @@ conversationDirective.directive("imagemessage", [function() {
 conversationDirective.directive("includinglinkmessage", [function() {
     return {
         restrict: "E",
+        replace:true,
         scope: { msg: "=" },
-        template: '<div class="">' +
-        '<div class="rongcloud-Message-text">' +
+        template: '<div class="rongcloud-Message-text">' +
         '<pre class="rongcloud-Message-entry" style="">' +
         '维护中 由于我们的服务商出现故障，融云官网及相关服务也受到影响，给各位用户带来的不便，还请谅解。  您可以通过 <a href="#">【官方微博】</a>了解</pre>' +
-        '</div>' +
-        '</div>'
+        '</div>' 
     }
 }]);
 
@@ -282,15 +281,14 @@ conversationDirective.directive("includinglinkmessage", [function() {
 conversationDirective.directive("voicemessage", ["$timeout", function($timeout: angular.ITimeoutService) {
     return {
         restrict: "E",
+        replace:true,
         scope: { msg: "=" },
-        template: '<div class="">' +
-        '<div class="rongcloud-Message-audio">' +
+        template: '<div class="rongcloud-Message-audio">' +
         '<span class="rongcloud-Message-entry" style="">' +
         '<span class="rongcloud-audioBox rongcloud-clearfix " ng-click="play()" ng-class="{\'rongcloud-animate\':isplaying}" ><i></i><i></i><i></i></span>' +
         '<div style="display: inline-block;" ><span class="rongcloud-audioTimer">{{msg.duration}}”</span><span class="rongcloud-audioState" ng-show="msg.isUnReade"></span></div>' +
         '</span>' +
-        '</div>' +
-        '</div>',
+        '</div>' ,
         link: function(scope, ele, attr) {
             scope.msg.duration = parseInt(scope.msg.duration || scope.msg.content.length / 1024);
 
@@ -322,16 +320,15 @@ conversationDirective.directive("voicemessage", ["$timeout", function($timeout: 
 conversationDirective.directive("locationmessage", [function() {
     return {
         restrict: "E",
+        replace:true,
         scope: { msg: "=" },
-        template: '<div class="">' +
-        '<div class="rongcloud-Message-map">' +
+        template: '<div class="rongcloud-Message-map">' +
         '<span class="rongcloud-Message-entry" style="">' +
         '<div class="rongcloud-mapBox">' +
         '<img ng-src="{{msg.content}}" alt="">' +
         '<span>{{msg.poi}}</span>' +
         '</div>' +
         '</span>' +
-        '</div>' +
         '</div>'
     }
 }]);
@@ -339,9 +336,9 @@ conversationDirective.directive("locationmessage", [function() {
 conversationDirective.directive("richcontentmessage", [function() {
     return {
         restrict: "E",
+        replace:true,
         scope: { msg: "=" },
-        template: '<div class="">' +
-        '<div class="rongcloud-Message-image-text">' +
+        template: '<div class="rongcloud-Message-image-text">' +
         '<span class="rongcloud-Message-entry" style="">' +
         '<div class="rongcloud-image-textBox">' +
         '<h4>{{msg.title}}</h4>' +
@@ -351,7 +348,6 @@ conversationDirective.directive("richcontentmessage", [function() {
         '</div>' +
         '</div>' +
         '</span>' +
-        '</div>' +
         '</div>'
     }
 }]);
